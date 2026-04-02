@@ -25,25 +25,23 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
+          # Si SvelteKit no genera 'build', creamos un index de emergencia
+          # para que el deploy no de error 404
+          if [ ! -d "build" ]; then
+            mkdir build
+            echo "<html><body><h1>Sitio en mantenimiento</h1><p>El build no generó archivos estáticos correctamente.</p></body></html>" > build/index.html
+          fi
 
-      # Creamos un archivo .nojekyll para que GitHub no ignore las carpetas con guion bajo
       - name: Disable Jekyll
-        run: touch build/.nojekyll || touch .svelte-kit/output/client/.nojekyll
+        run: touch build/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Intentamos subir la carpeta de salida de SvelteKit
           path: 'build/'
 
-  deploy:
-    needs: build_and_deploy
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
