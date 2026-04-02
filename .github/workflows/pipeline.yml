@@ -25,15 +25,25 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build --if-present
+        run: npm run build
 
-      # Esta línea es el truco: Si no existe carpeta build, 
-      # usa la raíz, pero asegura que Pages encuentre un index.
+      # Creamos un archivo .nojekyll para que GitHub no ignore las carpetas con guion bajo
+      - name: Disable Jekyll
+        run: touch build/.nojekyll || touch .svelte-kit/output/client/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' 
+          # Intentamos subir la carpeta de salida de SvelteKit
+          path: 'build/'
 
+  deploy:
+    needs: build_and_deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
