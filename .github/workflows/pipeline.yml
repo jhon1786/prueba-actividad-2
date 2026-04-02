@@ -25,15 +25,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build project
         run: npm run build --if-present
 
+      # PASO CLAVE: Si el build genera una carpeta específica, la usamos.
+      # Para este repo base, intentaremos con la carpeta 'build' o la raíz.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Si el build genera una carpeta 'build' o 'dist', la usamos. 
-          # Si no, subimos la raíz para evitar que falle.
-          path: '.' 
+          path: '.' # Mantenemos el punto pero nos aseguramos que el build existió
 
   deploy:
     needs: build
