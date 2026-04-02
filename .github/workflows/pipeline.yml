@@ -26,14 +26,14 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: npm run build --if-present
+        run: npm run build
 
-      # PASO CLAVE: Si el build genera una carpeta específica, la usamos.
-      # Para este repo base, intentaremos con la carpeta 'build' o la raíz.
+      # ESTE ES EL CAMBIO: SvelteKit por defecto genera la salida en 'build'
+      # o 'dist' dependiendo del adaptador. Vamos a subir la carpeta de salida.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # Mantenemos el punto pero nos aseguramos que el build existió
+          path: 'build/' 
 
   deploy:
     needs: build
